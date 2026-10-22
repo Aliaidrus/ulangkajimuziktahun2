@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jom Muzik! — Kuiz Pendidikan Muzik Tahun 2</title>
+<style>
+:root{--ink:#26324b;--purple:#7257d8;--pink:#ff7ba8;--yellow:#ffcf5a;--mint:#b9f1dc;--paper:#fffdf7}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Trebuchet MS",Arial,sans-serif;color:var(--ink);background:linear-gradient(135deg,#fff2f7,#eff8ff 55%,#f4fff2);font-size:18px}
+header{padding:30px 16px 22px;text-align:center;background:#fff9; border-bottom:3px solid #fff}
+header .note{font-size:44px}
+h1{font-size:clamp(28px,5vw,42px);margin:8px 0;color:#5c45bd}
+header p{margin:6px auto;max-width:620px;line-height:1.5}
+main{max-width:820px;margin:22px auto;padding:0 14px 40px}
+.panel{background:white;border-radius:24px;padding:22px;box-shadow:0 8px 24px #39456a14;border:2px solid #fff}
+.student-info{background:#fff9e8;border:2px dashed #f0c75e;border-radius:18px;padding:16px;margin-bottom:18px}.student-info h2{margin:0 0 10px;font-size:21px;color:#5c45bd}.student-fields{display:grid;grid-template-columns:2fr 1fr;gap:12px}.student-fields label{display:block;font-weight:bold;font-size:15px;margin-bottom:6px}.student-fields input{width:100%;padding:12px;border:2px solid #e7e7f3;border-radius:12px;font:inherit;font-size:16px;color:var(--ink)}.student-fields input:focus{outline:2px solid var(--purple)}.student-result{background:#f6f3ff;border-radius:14px;padding:14px;margin:12px auto;max-width:480px;line-height:1.7}.topline{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:12px}
+.pill{background:#f0eaff;border-radius:99px;padding:8px 13px;font-size:15px;font-weight:bold}
+.progress{height:12px;background:#eee9ff;border-radius:99px;overflow:hidden;margin:12px 0 22px}
+#bar{height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--pink));transition:width .25s}
+#question{font-size:24px;line-height:1.4;margin:10px 0 18px}
+.options{display:grid;gap:11px}
+.option{width:100%;text-align:left;padding:14px 16px;border:2px solid #e7e7f3;border-radius:16px;background:#fff;font:inherit;color:var(--ink);cursor:pointer;transition:.15s}
+.option:hover{border-color:var(--purple);background:#faf8ff}
+.option.selected{border-color:var(--purple);background:#f0eaff}
+.option.correct{border-color:#20a875;background:#eafff5}
+.option.wrong{border-color:#ed6682;background:#fff0f3}
+.option:disabled{cursor:default}
+.feedback{min-height:30px;font-weight:bold;margin:14px 0 4px;line-height:1.5}
+.controls{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:18px}
+button.action{border:0;border-radius:99px;padding:13px 20px;font-size:17px;font-weight:bold;cursor:pointer;background:var(--purple);color:white}
+button.action.secondary{background:#f1effb;color:#5142a0}
+button.action:disabled{opacity:.45;cursor:not-allowed}
+#result{display:none;text-align:center;padding:18px 8px}
+.bigscore{font-size:52px;font-weight:900;color:#5c45bd;margin:10px}
+.stars{font-size:35px;letter-spacing:5px}
+.review{margin:20px 0;text-align:left}
+.review-item{padding:13px 0;border-bottom:1px solid #eee;line-height:1.5}
+.small{font-size:14px;color:#65708a}
+footer{text-align:center;padding:0 14px 28px;color:#69728a;font-size:14px}
+@media(max-width:520px){.student-fields{grid-template-columns:1fr}body{font-size:16px}.panel{padding:17px}#question{font-size:21px}.option{padding:13px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="note">🎵 🎶 🎹</div>
+  <h1>Jom Muzik!</h1>
+  <p><strong>Kuiz Pendidikan Muzik Tahun 2</strong></p>
+  <p>Hai, kawan muzik! Jawab 15 soalan mudah. Pilih satu jawapan bagi setiap soalan dan lihat markah kamu di akhir kuiz. 🌈</p>
+</header>
+<main>
+<section class="panel" id="quiz">
+  <div class="student-info">
+    <h2>📝 Maklumat Murid</h2>
+    <div class="student-fields">
+      <div><label for="studentName">Nama penuh</label><input id="studentName" type="text" placeholder="Tulis nama penuh kamu" autocomplete="name" required></div>
+      <div><label for="studentClass">Kelas</label><input id="studentClass" type="text" placeholder="Contoh: 2 Bestari" required></div>
+    </div>
+    <p class="small">Isi nama dan kelas supaya guru boleh menyemak keputusan kamu.</p>
+  </div>
+  <div class="topline"><span class="pill" id="counter">Soalan 1 daripada 15</span><span class="pill">⭐ 1 markah setiap soalan</span></div>
+  <div class="progress"><div id="bar"></div></div>
+  <div id="question"></div>
+  <div class="options" id="options"></div>
+  <div class="feedback" id="feedback" aria-live="polite"></div>
+  <div class="controls">
+    <button class="action secondary" id="back" disabled>← Kembali</button>
+    <button class="action" id="next" disabled>Jawapan seterusnya →</button>
+  </div>
+</section>
+<section class="panel" id="result">
+  <div class="stars" id="stars">🌟🌟🌟</div>
+  <h2>Syabas, kawan muzik!</h2>
+  <p>Inilah keputusan kamu:</p>
+  <div class="student-result" id="studentResult"></div>
+  <div class="bigscore" id="score"></div>
+  <p id="message"></p>
+  <div class="controls" style="justify-content:center">
+    <button class="action" id="retry">🔁 Cuba sekali lagi</button>
+    <button class="action secondary" id="showReview">📖 Semak jawapan</button>
+  </div>
+  <div class="review" id="review" style="display:none"></div>
+</section>
+</main>
+<footer>Berdasarkan topik Seni Muzik dalam Buku Teks Pendidikan Kesenian Tahun 2. Belajar sambil bergembira! 🎵</footer>
+<script>
+const questions = [
+ {q:"Apakah maksud tempo dalam lagu?",o:["Laju atau lambat sesuatu lagu","Warna pakaian penyanyi","Nama alat lukisan"],a:0,why:"Tempo menunjukkan kelajuan lagu — tempo boleh lambat atau cepat."},
+ {q:"Arnab biasanya bergerak dengan pantas. Lagu yang sesuai untuk arnab ialah lagu bertempo…",o:["Lambat","Cepat","Tidak berbunyi"],a:1,why:"Tempo cepat sesuai dengan gerakan yang pantas."},
+ {q:"Apabila menyanyi sambil berdiri, apakah postur yang betul?",o:["Berdiri tegak dan pandang ke hadapan","Membongkok ke bawah","Bersandar jauh ke belakang"],a:0,why:"Berdiri tegak membantu kita menyanyi dengan baik."},
+ {q:"Apakah yang patut kita lakukan sebelum menyanyikan lagu?",o:["Menjerit sekuat hati","Dengar lagu dan ikut pic yang betul","Berlari mengelilingi kelas"],a:1,why:"Dengar lagu dahulu dan cuba menyanyi dengan pic yang betul."},
+ {q:"Dalam latihan irama, sebutan “ta” biasanya menunjukkan…",o:["Satu bunyi/tepukan","Dua bunyi pantas","Berhenti selama-lamanya"],a:0,why:"“Ta” disebut sambil membuat satu tepukan."},
+ {q:"Sebutan “ti-ti” dimainkan sebagai…",o:["Satu tepukan panjang sahaja","Dua bunyi pantas","Tiada bunyi langsung"],a:1,why:"“Ti-ti” mewakili dua bunyi yang pantas."},
+ {q:"Melodi menaik bergerak dari bunyi…",o:["Rendah ke tinggi","Tinggi ke rendah","Sama tinggi sepanjang masa"],a:0,why:"Melodi menaik bergerak daripada pic rendah ke pic tinggi."},
+ {q:"Melodi menurun bergerak dari bunyi…",o:["Rendah ke tinggi","Tinggi ke rendah","Sentiasa senyap"],a:1,why:"Melodi menurun bergerak daripada pic tinggi ke pic rendah."},
+ {q:"Apakah melodi mendatar?",o:["Pic kekal pada aras yang sama","Pic semakin tinggi","Pic semakin rendah"],a:0,why:"Melodi mendatar tidak naik atau turun."},
+ {q:"Botol plastik atau tin boleh digunakan untuk menghasilkan bunyi. Ini ialah contoh…",o:["Alat muzik improvisasi","Buku cerita","Alat mewarna"],a:0,why:"Bahan di sekeliling boleh digunakan untuk mencipta bunyi muzik."},
+ {q:"Yang manakah contoh alat perkusi?",o:["Loceng","Bantal","Pemadam"],a:0,why:"Loceng ialah alat perkusi yang menghasilkan bunyi apabila dimainkan."},
+ {q:"Dalam paluan kompang, apakah dua sebutan bunyi yang dipelajari?",o:["La dan do","Pak dan bung","Ta dan sa"],a:1,why:"Paluan kompang dalam buku teks menggunakan sebutan “pak” dan “bung”."},
+ {q:"Apakah maksud bermain secara ensembel?",o:["Bermain muzik bersama-sama","Bermain seorang diri tanpa bunyi","Mewarna gambar bersama"],a:0,why:"Ensembel ialah persembahan muzik bersama-sama."},
+ {q:"Jika guru meminta kita memainkan alat muzik dengan bunyi perlahan, kita perlu bermain…",o:["Dengan bunyi perlahan","Dengan bunyi paling kuat","Tanpa mengikut irama"],a:0,why:"Ikut arahan bunyi kuat atau perlahan ketika bermain muzik."},
+ {q:"Semasa menyanyikan lagu bersama rakan, apakah sikap yang baik?",o:["Berebut-rebut menyanyi paling kuat","Dengar rakan dan ikut tempo bersama-sama","Sengaja mengganggu rakan"],a:1,why:"Kita perlu bekerjasama, mendengar rakan dan menyanyi mengikut tempo."}
+];
+let current=0, answers=Array(questions.length).fill(null), checked=Array(questions.length).fill(false);
+const $=id=>document.getElementById(id);
+function escapeHtml(value){return value.replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;", "'":"&#39;"}[ch]));}
+function render(){
+ const item=questions[current];
+ $("counter").textContent=`Soalan ${current+1} daripada ${questions.length}`;
+ $("bar").style.width=`${current/questions.length*100}%`;
+ $("question").textContent=item.q;
+ $("options").innerHTML="";
+ item.o.forEach((opt,i)=>{
+  const b=document.createElement("button");b.className="option";b.textContent=String.fromCharCode(65+i)+". "+opt;
+  if(answers[current]===i)b.classList.add("selected");
+  if(checked[current]){b.disabled=true;if(i===item.a)b.classList.add("correct");else if(i===answers[current])b.classList.add("wrong");}
+  b.onclick=()=>{if(checked[current])return;answers[current]=i;render();};$("options").appendChild(b);
+ });
+ $("feedback").textContent=checked[current]?(answers[current]===item.a?"✅ Betul! "+item.why:"💡 Belum tepat. "+item.why):"";
+ $("back").disabled=current===0;
+ $("next").disabled=answers[current]===null;
+ $("next").textContent=current===questions.length-1?"Semak markah ⭐":"Jawapan seterusnya →";
+}
+$("next").onclick=()=>{
+ if(answers[current]===null)return;
+ checked[current]=true;
+ if(current<questions.length-1){render();current++;render();}
+ else showResult();
+};
+$("back").onclick=()=>{if(current>0){current--;render();}};
+function showResult(){
+ const studentName=$("studentName").value.trim();
+ const studentClass=$("studentClass").value.trim();
+ if(!studentName||!studentClass){
+  alert("Sila isi nama penuh dan kelas dahulu supaya guru boleh menyemak keputusan.");
+  $("studentName").focus();
+  return;
+ }
+ $("studentResult").innerHTML=`<strong>Nama:</strong> ${escapeHtml(studentName)}<br><strong>Kelas:</strong> ${escapeHtml(studentClass)}`;
+ const score=answers.reduce((n,a,i)=>n+(a===questions[i].a?1:0),0);
+ $("quiz").style.display="none";$("result").style.display="block";
+ $("bar").style.width="100%";$("score").textContent=`${score} / ${questions.length}`;
+ $("stars").textContent=score>=13?"🏆🌟🎉":score>=9?"🌟🎵👏":"🎵💪🌈";
+ $("message").textContent=score>=13?"Hebat! Kamu memang bintang muzik!":score>=9?"Bagus! Teruskan berlatih untuk jadi lebih hebat!":"Jangan putus asa. Baca jawapan dan cuba lagi, ya!";
+ $("review").style.display="none";$("review").innerHTML="";
+ questions.forEach((q,i)=>{const d=document.createElement("div");d.className="review-item";d.innerHTML=`<strong>${i+1}. ${q.q}</strong><br>Jawapan betul: <strong>${q.o[q.a]}</strong><br><span class="small">${q.why}</span>`;$("review").appendChild(d);});
+}
+$("retry").onclick=()=>{current=0;answers=Array(questions.length).fill(null);checked=Array(questions.length).fill(false);$("result").style.display="none";$("quiz").style.display="block";render();};
+$("showReview").onclick=()=>{$("review").style.display=$("review").style.display==="none"?"block":"none";$("showReview").textContent=$("review").style.display==="none"?"📖 Semak jawapan":"🙈 Tutup semakan";};
+render();
+</script>
+</body>
+</html>
